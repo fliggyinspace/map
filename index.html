@@ -1065,9 +1065,9 @@ body.has-nl-badge .sheet{height:auto;bottom:calc(72px + env(safe-area-inset-bott
 body.has-nl-badge .leaflet-bottom.leaflet-right{margin-bottom:72px}
 
 @media (max-width: 860px){
-  .sidebar{inset:0;padding-bottom:calc(196px + env(safe-area-inset-bottom))}
-  /* 导航固定为左下角竖排悬浮条；右下角留给 Netlify 徽标（分支部署没有徽标也不影响） */
-  .bottom-nav{
+  body.has-nl-badge .sidebar{inset:0;padding-bottom:calc(196px + env(safe-area-inset-bottom))}
+  /* 只有 Netlify 免费版有徽标时才把导航改成左下角竖排，给右下角徽标让位 */
+  body.has-nl-badge .bottom-nav{
     left:12px;right:auto;bottom:calc(12px + env(safe-area-inset-bottom));
     transform:none;flex-direction:column;
     width:auto;height:auto;padding:6px;gap:4px;
@@ -1076,15 +1076,15 @@ body.has-nl-badge .leaflet-bottom.leaflet-right{margin-bottom:72px}
     -webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);
     box-shadow:0 10px 30px rgba(0,0,0,.18);
   }
-  .bottom-nav button{
+  body.has-nl-badge .bottom-nav button{
     flex:0 0 auto;width:62px;height:54px;border-radius:14px;gap:2px;font-size:10px;
   }
-  .bottom-nav button.active{background:var(--soft)}
-  .legend{
+  body.has-nl-badge .bottom-nav button.active{background:var(--soft)}
+  body.has-nl-badge .legend{
     top:calc(14px + env(safe-area-inset-top));bottom:auto;left:12px;
   }
-  body.picking .legend{display:none}
-  .toast{bottom:calc(210px + env(safe-area-inset-bottom))}
+  body.has-nl-badge.picking .legend{display:none}
+  body.has-nl-badge .toast{bottom:calc(210px + env(safe-area-inset-bottom))}
 }
 </style>
 </head>
