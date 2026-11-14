@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
 <meta name="theme-color" content="#fff7f1">
-<title>探店地图 · 附近吃啥</title>
+<title>美食地图 · 附近吃啥</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23ff6b35'/%3E%3Ctext x='32' y='45' font-size='36' text-anchor='middle' fill='white' font-family='sans-serif'%3E吃%3C/text%3E%3C/svg%3E">
 <style>/* required styles */
 
@@ -1138,7 +1138,7 @@ body.has-nl-badge .leaflet-bottom.leaflet-right{margin-bottom:72px}
       <div class="brand">
         <div class="logo">吃</div>
         <div class="brand-text">
-          <h1>探店地图</h1>
+          <h1>美食地图</h1>
           <p id="statLine">载入中…</p>
         </div>
       </div>
@@ -4286,7 +4286,7 @@ window.SEED_PLACES = [
   }
 ];
 </script>
-<script>/* 探店地图 —— 一个本地跑的「饭馆收藏夹 + 地图」
+<script>/* 美食地图 —— 一个本地跑的「饭馆收藏夹 + 地图」
    数据只存在浏览器 localStorage 里，可导出 JSON 备份。 */
 (function () {
   'use strict';
@@ -5314,10 +5314,10 @@ window.SEED_PLACES = [
 
   function exportJSON() {
     var payload = {
-      app: '探店地图', version: 1, exportedAt: new Date().toISOString(),
+      app: '美食地图', version: 1, exportedAt: new Date().toISOString(),
       places: state.places, myLoc: state.myLoc
     };
-    download('探店地图备份-' + stamp() + '.json', JSON.stringify(payload, null, 2));
+    download('美食地图备份-' + stamp() + '.json', JSON.stringify(payload, null, 2));
     toast('已导出 ' + state.places.length + ' 家');
   }
 
@@ -5335,7 +5335,7 @@ window.SEED_PLACES = [
         new Date(p.createdAt).toLocaleString('zh-CN')
       ].map(csvCell).join(',');
     });
-    download('探店地图-' + stamp() + '.csv', '\ufeff' + head.map(csvCell).join(',') + '\n' + rows.join('\n'),
+    download('美食地图-' + stamp() + '.csv', '\ufeff' + head.map(csvCell).join(',') + '\n' + rows.join('\n'),
       'text/csv;charset=utf-8');
     toast('已导出 CSV');
   }
@@ -5615,7 +5615,7 @@ window.SEED_PLACES = [
     renderAll();
     if (!ok && state.places.length) {
       setTimeout(function () {
-        toast('坐标来自探店地图，点开店 →「调整位置」可微调', {
+        toast('坐标来自美食地图，点开店 →「调整位置」可微调', {
           action: '知道', duration: 6000
         });
       }, 900);
