@@ -974,6 +974,12 @@ body.picking #map{cursor:crosshair}
 .info-row>span{flex:none;width:52px;color:var(--sub);font-size:12px;padding-top:1px}
 .info-row p{margin:0;flex:1;min-width:0;line-height:1.55;word-break:break-word}
 .info-row .note{white-space:pre-wrap}
+.info-row .xhs-links{display:flex;flex-direction:column;gap:5px}
+.info-row .xhs-links a{
+  color:#e11d48;text-decoration:none;font-size:12.5px;line-height:1.4;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.info-row .xhs-links a:hover{text-decoration:underline}
 .info-row .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;color:#4b5058}
 .chips-inline{display:flex;flex-wrap:wrap;gap:6px}
 .chips-inline em{font-style:normal;font-size:12px;background:var(--soft);border:1px solid var(--line);padding:2px 8px;border-radius:7px}
@@ -1216,7 +1222,7 @@ body.has-nl-badge .leaflet-bottom.leaflet-right{margin-bottom:72px}
 !function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(exports):"function"==typeof define&&define.amd?define(["exports"],t):t(((e=e||self).Leaflet=e.Leaflet||{},e.Leaflet.markercluster={}))}(this,function(e){"use strict";var t=L.MarkerClusterGroup=L.FeatureGroup.extend({options:{maxClusterRadius:80,iconCreateFunction:null,clusterPane:L.Marker.prototype.options.pane,spiderfyOnEveryZoom:!1,spiderfyOnMaxZoom:!0,showCoverageOnHover:!0,zoomToBoundsOnClick:!0,singleMarkerMode:!1,disableClusteringAtZoom:null,removeOutsideVisibleBounds:!0,animate:!0,animateAddingMarkers:!1,spiderfyShapePositions:null,spiderfyDistanceMultiplier:1,spiderLegPolylineOptions:{weight:1.5,color:"#222",opacity:.5},chunkedLoading:!1,chunkInterval:200,chunkDelay:50,chunkProgress:null,polygonOptions:{}},initialize:function(e){L.Util.setOptions(this,e),this.options.iconCreateFunction||(this.options.iconCreateFunction=this._defaultIconCreateFunction),this._featureGroup=L.featureGroup(),this._featureGroup.addEventParent(this),this._nonPointGroup=L.featureGroup(),this._nonPointGroup.addEventParent(this),this._inZoomAnimation=0,this._needsClustering=[],this._needsRemoving=[],this._currentShownBounds=null,this._queue=[],this._childMarkerEventHandlers={dragstart:this._childMarkerDragStart,move:this._childMarkerMoved,dragend:this._childMarkerDragEnd};var t=L.DomUtil.TRANSITION&&this.options.animate;L.extend(this,t?this._withAnimation:this._noAnimation),this._markerCluster=t?L.MarkerCluster:L.MarkerClusterNonAnimated},addLayer:function(e){if(e instanceof L.LayerGroup)return this.addLayers([e]);if(!e.getLatLng)return this._nonPointGroup.addLayer(e),this.fire("layeradd",{layer:e}),this;if(!this._map)return this._needsClustering.push(e),this.fire("layeradd",{layer:e}),this;if(this.hasLayer(e))return this;this._unspiderfy&&this._unspiderfy(),this._addLayer(e,this._maxZoom),this.fire("layeradd",{layer:e}),this._topClusterLevel._recalculateBounds(),this._refreshClustersIcons();var t=e,i=this._zoom;if(e.__parent)for(;t.__parent._zoom>=i;)t=t.__parent;return this._currentShownBounds.contains(t.getLatLng())&&(this.options.animateAddingMarkers?this._animationAddLayer(e,t):this._animationAddLayerNonAnimated(e,t)),this},removeLayer:function(e){return e instanceof L.LayerGroup?this.removeLayers([e]):(e.getLatLng?this._map?e.__parent&&(this._unspiderfy&&(this._unspiderfy(),this._unspiderfyLayer(e)),this._removeLayer(e,!0),this.fire("layerremove",{layer:e}),this._topClusterLevel._recalculateBounds(),this._refreshClustersIcons(),e.off(this._childMarkerEventHandlers,this),this._featureGroup.hasLayer(e)&&(this._featureGroup.removeLayer(e),e.clusterShow&&e.clusterShow())):(!this._arraySplice(this._needsClustering,e)&&this.hasLayer(e)&&this._needsRemoving.push({layer:e,latlng:e._latlng}),this.fire("layerremove",{layer:e})):(this._nonPointGroup.removeLayer(e),this.fire("layerremove",{layer:e})),this)},addLayers:function(n,s){if(!L.Util.isArray(n))return this.addLayer(n);var o,a=this._featureGroup,h=this._nonPointGroup,l=this.options.chunkedLoading,u=this.options.chunkInterval,_=this.options.chunkProgress,d=n.length,p=0,c=!0;if(this._map){var f=(new Date).getTime(),m=L.bind(function(){var e=(new Date).getTime();for(this._map&&this._unspiderfy&&this._unspiderfy();p<d;p++){if(l&&p%200==0){var t=(new Date).getTime()-e;if(u<t)break}if((o=n[p])instanceof L.LayerGroup)c&&(n=n.slice(),c=!1),this._extractNonGroupLayers(o,n),d=n.length;else if(o.getLatLng){if(!this.hasLayer(o)&&(this._addLayer(o,this._maxZoom),s||this.fire("layeradd",{layer:o}),o.__parent&&2===o.__parent.getChildCount())){var i=o.__parent.getAllChildMarkers(),r=i[0]===o?i[1]:i[0];a.removeLayer(r)}}else h.addLayer(o),s||this.fire("layeradd",{layer:o})}_&&_(p,d,(new Date).getTime()-f),p===d?(this._topClusterLevel._recalculateBounds(),this._refreshClustersIcons(),this._topClusterLevel._recursivelyAddChildrenToMap(null,this._zoom,this._currentShownBounds)):setTimeout(m,this.options.chunkDelay)},this);m()}else for(var e=this._needsClustering;p<d;p++)(o=n[p])instanceof L.LayerGroup?(c&&(n=n.slice(),c=!1),this._extractNonGroupLayers(o,n),d=n.length):o.getLatLng?this.hasLayer(o)||e.push(o):h.addLayer(o);return this},removeLayers:function(e){var t,i,r=e.length,n=this._featureGroup,s=this._nonPointGroup,o=!0;if(!this._map){for(t=0;t<r;t++)(i=e[t])instanceof L.LayerGroup?(o&&(e=e.slice(),o=!1),this._extractNonGroupLayers(i,e),r=e.length):(this._arraySplice(this._needsClustering,i),s.removeLayer(i),this.hasLayer(i)&&this._needsRemoving.push({layer:i,latlng:i._latlng}),this.fire("layerremove",{layer:i}));return this}if(this._unspiderfy){this._unspiderfy();var a=e.slice(),h=r;for(t=0;t<h;t++)(i=a[t])instanceof L.LayerGroup?(this._extractNonGroupLayers(i,a),h=a.length):this._unspiderfyLayer(i)}for(t=0;t<r;t++)(i=e[t])instanceof L.LayerGroup?(o&&(e=e.slice(),o=!1),this._extractNonGroupLayers(i,e),r=e.length):i.__parent?(this._removeLayer(i,!0,!0),this.fire("layerremove",{layer:i}),n.hasLayer(i)&&(n.removeLayer(i),i.clusterShow&&i.clusterShow())):(s.removeLayer(i),this.fire("layerremove",{layer:i}));return this._topClusterLevel._recalculateBounds(),this._refreshClustersIcons(),this._topClusterLevel._recursivelyAddChildrenToMap(null,this._zoom,this._currentShownBounds),this},clearLayers:function(){return this._map||(this._needsClustering=[],this._needsRemoving=[],delete this._gridClusters,delete this._gridUnclustered),this._noanimationUnspiderfy&&this._noanimationUnspiderfy(),this._featureGroup.clearLayers(),this._nonPointGroup.clearLayers(),this.eachLayer(function(e){e.off(this._childMarkerEventHandlers,this),delete e.__parent},this),this._map&&this._generateInitialClusters(),this},getBounds:function(){var e=new L.LatLngBounds;this._topClusterLevel&&e.extend(this._topClusterLevel._bounds);for(var t=this._needsClustering.length-1;0<=t;t--)e.extend(this._needsClustering[t].getLatLng());return e.extend(this._nonPointGroup.getBounds()),e},eachLayer:function(e,t){var i,r,n,s=this._needsClustering.slice(),o=this._needsRemoving;for(this._topClusterLevel&&this._topClusterLevel.getAllChildMarkers(s),r=s.length-1;0<=r;r--){for(i=!0,n=o.length-1;0<=n;n--)if(o[n].layer===s[r]){i=!1;break}i&&e.call(t,s[r])}this._nonPointGroup.eachLayer(e,t)},getLayers:function(){var t=[];return this.eachLayer(function(e){t.push(e)}),t},getLayer:function(t){var i=null;return t=parseInt(t,10),this.eachLayer(function(e){L.stamp(e)===t&&(i=e)}),i},hasLayer:function(e){if(!e)return!1;var t,i=this._needsClustering;for(t=i.length-1;0<=t;t--)if(i[t]===e)return!0;for(t=(i=this._needsRemoving).length-1;0<=t;t--)if(i[t].layer===e)return!1;return!(!e.__parent||e.__parent._group!==this)||this._nonPointGroup.hasLayer(e)},zoomToShowLayer:function(e,t){var i=this._map;"function"!=typeof t&&(t=function(){});var r=function(){!i.hasLayer(e)&&!i.hasLayer(e.__parent)||this._inZoomAnimation||(this._map.off("moveend",r,this),this.off("animationend",r,this),i.hasLayer(e)?t():e.__parent._icon&&(this.once("spiderfied",t,this),e.__parent.spiderfy()))};e._icon&&this._map.getBounds().contains(e.getLatLng())?t():e.__parent._zoom<Math.round(this._map._zoom)?(this._map.on("moveend",r,this),this._map.panTo(e.getLatLng())):(this._map.on("moveend",r,this),this.on("animationend",r,this),e.__parent.zoomToBounds())},onAdd:function(e){var t,i,r;if(this._map=e,!isFinite(this._map.getMaxZoom()))throw"Map has no maxZoom specified";for(this._featureGroup.addTo(e),this._nonPointGroup.addTo(e),this._gridClusters||this._generateInitialClusters(),this._maxLat=e.options.crs.projection.MAX_LATITUDE,t=0,i=this._needsRemoving.length;t<i;t++)(r=this._needsRemoving[t]).newlatlng=r.layer._latlng,r.layer._latlng=r.latlng;for(t=0,i=this._needsRemoving.length;t<i;t++)r=this._needsRemoving[t],this._removeLayer(r.layer,!0),r.layer._latlng=r.newlatlng;this._needsRemoving=[],this._zoom=Math.round(this._map._zoom),this._currentShownBounds=this._getExpandedVisibleBounds(),this._map.on("zoomend",this._zoomEnd,this),this._map.on("moveend",this._moveEnd,this),this._spiderfierOnAdd&&this._spiderfierOnAdd(),this._bindEvents(),i=this._needsClustering,this._needsClustering=[],this.addLayers(i,!0)},onRemove:function(e){e.off("zoomend",this._zoomEnd,this),e.off("moveend",this._moveEnd,this),this._unbindEvents(),this._map._mapPane.className=this._map._mapPane.className.replace(" leaflet-cluster-anim",""),this._spiderfierOnRemove&&this._spiderfierOnRemove(),delete this._maxLat,this._hideCoverage(),this._featureGroup.remove(),this._nonPointGroup.remove(),this._featureGroup.clearLayers(),this._map=null},getVisibleParent:function(e){for(var t=e;t&&!t._icon;)t=t.__parent;return t||null},_arraySplice:function(e,t){for(var i=e.length-1;0<=i;i--)if(e[i]===t)return e.splice(i,1),!0},_removeFromGridUnclustered:function(e,t){for(var i=this._map,r=this._gridUnclustered,n=Math.floor(this._map.getMinZoom());n<=t&&r[t].removeObject(e,i.project(e.getLatLng(),t));t--);},_childMarkerDragStart:function(e){e.target.__dragStart=e.target._latlng},_childMarkerMoved:function(e){if(!this._ignoreMove&&!e.target.__dragStart){var t=e.target._popup&&e.target._popup.isOpen();this._moveChild(e.target,e.oldLatLng,e.latlng),t&&e.target.openPopup()}},_moveChild:function(e,t,i){e._latlng=t,this.removeLayer(e),e._latlng=i,this.addLayer(e)},_childMarkerDragEnd:function(e){var t=e.target.__dragStart;delete e.target.__dragStart,t&&this._moveChild(e.target,t,e.target._latlng)},_removeLayer:function(e,t,i){var r=this._gridClusters,n=this._gridUnclustered,s=this._featureGroup,o=this._map,a=Math.floor(this._map.getMinZoom());t&&this._removeFromGridUnclustered(e,this._maxZoom);var h,l=e.__parent,u=l._markers;for(this._arraySplice(u,e);l&&(l._childCount--,l._boundsNeedUpdate=!0,!(l._zoom<a));)t&&l._childCount<=1?(h=l._markers[0]===e?l._markers[1]:l._markers[0],r[l._zoom].removeObject(l,o.project(l._cLatLng,l._zoom)),n[l._zoom].addObject(h,o.project(h.getLatLng(),l._zoom)),this._arraySplice(l.__parent._childClusters,l),l.__parent._markers.push(h),h.__parent=l.__parent,l._icon&&(s.removeLayer(l),i||s.addLayer(h))):l._iconNeedsUpdate=!0,l=l.__parent;delete e.__parent},_isOrIsParent:function(e,t){for(;t;){if(e===t)return!0;t=t.parentNode}return!1},fire:function(e,t,i){if(t&&t.layer instanceof L.MarkerCluster){if(t.originalEvent&&this._isOrIsParent(t.layer._icon,t.originalEvent.relatedTarget))return;e="cluster"+e}L.FeatureGroup.prototype.fire.call(this,e,t,i)},listens:function(e,t){return L.FeatureGroup.prototype.listens.call(this,e,t)||L.FeatureGroup.prototype.listens.call(this,"cluster"+e,t)},_defaultIconCreateFunction:function(e){var t=e.getChildCount(),i=" marker-cluster-";return i+=t<10?"small":t<100?"medium":"large",new L.DivIcon({html:"<div><span>"+t+"</span></div>",className:"marker-cluster"+i,iconSize:new L.Point(40,40)})},_bindEvents:function(){var e=this._map,t=this.options.spiderfyOnMaxZoom,i=this.options.showCoverageOnHover,r=this.options.zoomToBoundsOnClick,n=this.options.spiderfyOnEveryZoom;(t||r||n)&&this.on("clusterclick clusterkeypress",this._zoomOrSpiderfy,this),i&&(this.on("clustermouseover",this._showCoverage,this),this.on("clustermouseout",this._hideCoverage,this),e.on("zoomend",this._hideCoverage,this))},_zoomOrSpiderfy:function(e){var t=e.layer,i=t;if("clusterkeypress"!==e.type||!e.originalEvent||13===e.originalEvent.keyCode){for(;1===i._childClusters.length;)i=i._childClusters[0];i._zoom===this._maxZoom&&i._childCount===t._childCount&&this.options.spiderfyOnMaxZoom?t.spiderfy():this.options.zoomToBoundsOnClick&&t.zoomToBounds(),this.options.spiderfyOnEveryZoom&&t.spiderfy(),e.originalEvent&&13===e.originalEvent.keyCode&&this._map._container.focus()}},_showCoverage:function(e){var t=this._map;this._inZoomAnimation||(this._shownPolygon&&t.removeLayer(this._shownPolygon),2<e.layer.getChildCount()&&e.layer!==this._spiderfied&&(this._shownPolygon=new L.Polygon(e.layer.getConvexHull(),this.options.polygonOptions),t.addLayer(this._shownPolygon)))},_hideCoverage:function(){this._shownPolygon&&(this._map.removeLayer(this._shownPolygon),this._shownPolygon=null)},_unbindEvents:function(){var e=this.options.spiderfyOnMaxZoom,t=this.options.showCoverageOnHover,i=this.options.zoomToBoundsOnClick,r=this.options.spiderfyOnEveryZoom,n=this._map;(e||i||r)&&this.off("clusterclick clusterkeypress",this._zoomOrSpiderfy,this),t&&(this.off("clustermouseover",this._showCoverage,this),this.off("clustermouseout",this._hideCoverage,this),n.off("zoomend",this._hideCoverage,this))},_zoomEnd:function(){this._map&&(this._mergeSplitClusters(),this._zoom=Math.round(this._map._zoom),this._currentShownBounds=this._getExpandedVisibleBounds())},_moveEnd:function(){if(!this._inZoomAnimation){var e=this._getExpandedVisibleBounds();this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds,Math.floor(this._map.getMinZoom()),this._zoom,e),this._topClusterLevel._recursivelyAddChildrenToMap(null,Math.round(this._map._zoom),e),this._currentShownBounds=e}},_generateInitialClusters:function(){var e=Math.ceil(this._map.getMaxZoom()),t=Math.floor(this._map.getMinZoom()),i=this.options.maxClusterRadius,r=i;"function"!=typeof i&&(r=function(){return i}),null!==this.options.disableClusteringAtZoom&&(e=this.options.disableClusteringAtZoom-1),this._maxZoom=e,this._gridClusters={},this._gridUnclustered={};for(var n=e;t<=n;n--)this._gridClusters[n]=new L.DistanceGrid(r(n)),this._gridUnclustered[n]=new L.DistanceGrid(r(n));this._topClusterLevel=new this._markerCluster(this,t-1)},_addLayer:function(e,t){var i,r,n=this._gridClusters,s=this._gridUnclustered,o=Math.floor(this._map.getMinZoom());for(this.options.singleMarkerMode&&this._overrideMarkerIcon(e),e.on(this._childMarkerEventHandlers,this);o<=t;t--){i=this._map.project(e.getLatLng(),t);var a=n[t].getNearObject(i);if(a)return a._addChild(e),void(e.__parent=a);if(a=s[t].getNearObject(i)){var h=a.__parent;h&&this._removeLayer(a,!1);var l=new this._markerCluster(this,t,a,e);n[t].addObject(l,this._map.project(l._cLatLng,t)),a.__parent=l;var u=e.__parent=l;for(r=t-1;r>h._zoom;r--)u=new this._markerCluster(this,r,u),n[r].addObject(u,this._map.project(a.getLatLng(),r));return h._addChild(u),void this._removeFromGridUnclustered(a,t)}s[t].addObject(e,i)}this._topClusterLevel._addChild(e),e.__parent=this._topClusterLevel},_refreshClustersIcons:function(){this._featureGroup.eachLayer(function(e){e instanceof L.MarkerCluster&&e._iconNeedsUpdate&&e._updateIcon()})},_enqueue:function(e){this._queue.push(e),this._queueTimeout||(this._queueTimeout=setTimeout(L.bind(this._processQueue,this),300))},_processQueue:function(){for(var e=0;e<this._queue.length;e++)this._queue[e].call(this);this._queue.length=0,clearTimeout(this._queueTimeout),this._queueTimeout=null},_mergeSplitClusters:function(){var e=Math.round(this._map._zoom);this._processQueue(),this._zoom<e&&this._currentShownBounds.intersects(this._getExpandedVisibleBounds())?(this._animationStart(),this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds,Math.floor(this._map.getMinZoom()),this._zoom,this._getExpandedVisibleBounds()),this._animationZoomIn(this._zoom,e)):this._zoom>e?(this._animationStart(),this._animationZoomOut(this._zoom,e)):this._moveEnd()},_getExpandedVisibleBounds:function(){return this.options.removeOutsideVisibleBounds?L.Browser.mobile?this._checkBoundsMaxLat(this._map.getBounds()):this._checkBoundsMaxLat(this._map.getBounds().pad(1)):this._mapBoundsInfinite},_checkBoundsMaxLat:function(e){var t=this._maxLat;return void 0!==t&&(e.getNorth()>=t&&(e._northEast.lat=1/0),e.getSouth()<=-t&&(e._southWest.lat=-1/0)),e},_animationAddLayerNonAnimated:function(e,t){if(t===e)this._featureGroup.addLayer(e);else if(2===t._childCount){t._addToMap();var i=t.getAllChildMarkers();this._featureGroup.removeLayer(i[0]),this._featureGroup.removeLayer(i[1])}else t._updateIcon()},_extractNonGroupLayers:function(e,t){var i,r=e.getLayers(),n=0;for(t=t||[];n<r.length;n++)(i=r[n])instanceof L.LayerGroup?this._extractNonGroupLayers(i,t):t.push(i);return t},_overrideMarkerIcon:function(e){return e.options.icon=this.options.iconCreateFunction({getChildCount:function(){return 1},getAllChildMarkers:function(){return[e]}})}});L.MarkerClusterGroup.include({_mapBoundsInfinite:new L.LatLngBounds(new L.LatLng(-1/0,-1/0),new L.LatLng(1/0,1/0))}),L.MarkerClusterGroup.include({_noAnimation:{_animationStart:function(){},_animationZoomIn:function(e,t){this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds,Math.floor(this._map.getMinZoom()),e),this._topClusterLevel._recursivelyAddChildrenToMap(null,t,this._getExpandedVisibleBounds()),this.fire("animationend")},_animationZoomOut:function(e,t){this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds,Math.floor(this._map.getMinZoom()),e),this._topClusterLevel._recursivelyAddChildrenToMap(null,t,this._getExpandedVisibleBounds()),this.fire("animationend")},_animationAddLayer:function(e,t){this._animationAddLayerNonAnimated(e,t)}},_withAnimation:{_animationStart:function(){this._map._mapPane.className+=" leaflet-cluster-anim",this._inZoomAnimation++},_animationZoomIn:function(n,s){var o,a=this._getExpandedVisibleBounds(),h=this._featureGroup,e=Math.floor(this._map.getMinZoom());this._ignoreMove=!0,this._topClusterLevel._recursively(a,n,e,function(e){var t,i=e._latlng,r=e._markers;for(a.contains(i)||(i=null),e._isSingleParent()&&n+1===s?(h.removeLayer(e),e._recursivelyAddChildrenToMap(null,s,a)):(e.clusterHide(),e._recursivelyAddChildrenToMap(i,s,a)),o=r.length-1;0<=o;o--)t=r[o],a.contains(t._latlng)||h.removeLayer(t)}),this._forceLayout(),this._topClusterLevel._recursivelyBecomeVisible(a,s),h.eachLayer(function(e){e instanceof L.MarkerCluster||!e._icon||e.clusterShow()}),this._topClusterLevel._recursively(a,n,s,function(e){e._recursivelyRestoreChildPositions(s)}),this._ignoreMove=!1,this._enqueue(function(){this._topClusterLevel._recursively(a,n,e,function(e){h.removeLayer(e),e.clusterShow()}),this._animationEnd()})},_animationZoomOut:function(e,t){this._animationZoomOutSingle(this._topClusterLevel,e-1,t),this._topClusterLevel._recursivelyAddChildrenToMap(null,t,this._getExpandedVisibleBounds()),this._topClusterLevel._recursivelyRemoveChildrenFromMap(this._currentShownBounds,Math.floor(this._map.getMinZoom()),e,this._getExpandedVisibleBounds())},_animationAddLayer:function(e,t){var i=this,r=this._featureGroup;r.addLayer(e),t!==e&&(2<t._childCount?(t._updateIcon(),this._forceLayout(),this._animationStart(),e._setPos(this._map.latLngToLayerPoint(t.getLatLng())),e.clusterHide(),this._enqueue(function(){r.removeLayer(e),e.clusterShow(),i._animationEnd()})):(this._forceLayout(),i._animationStart(),i._animationZoomOutSingle(t,this._map.getMaxZoom(),this._zoom)))}},_animationZoomOutSingle:function(t,i,r){var n=this._getExpandedVisibleBounds(),s=Math.floor(this._map.getMinZoom());t._recursivelyAnimateChildrenInAndAddSelfToMap(n,s,i+1,r);var o=this;this._forceLayout(),t._recursivelyBecomeVisible(n,r),this._enqueue(function(){if(1===t._childCount){var e=t._markers[0];this._ignoreMove=!0,e.setLatLng(e.getLatLng()),this._ignoreMove=!1,e.clusterShow&&e.clusterShow()}else t._recursively(n,r,s,function(e){e._recursivelyRemoveChildrenFromMap(n,s,i+1)});o._animationEnd()})},_animationEnd:function(){this._map&&(this._map._mapPane.className=this._map._mapPane.className.replace(" leaflet-cluster-anim","")),this._inZoomAnimation--,this.fire("animationend")},_forceLayout:function(){L.Util.falseFn(document.body.offsetWidth)}}),L.markerClusterGroup=function(e){return new L.MarkerClusterGroup(e)};var i=L.MarkerCluster=L.Marker.extend({options:L.Icon.prototype.options,initialize:function(e,t,i,r){L.Marker.prototype.initialize.call(this,i?i._cLatLng||i.getLatLng():new L.LatLng(0,0),{icon:this,pane:e.options.clusterPane}),this._group=e,this._zoom=t,this._markers=[],this._childClusters=[],this._childCount=0,this._iconNeedsUpdate=!0,this._boundsNeedUpdate=!0,this._bounds=new L.LatLngBounds,i&&this._addChild(i),r&&this._addChild(r)},getAllChildMarkers:function(e,t){e=e||[];for(var i=this._childClusters.length-1;0<=i;i--)this._childClusters[i].getAllChildMarkers(e,t);for(var r=this._markers.length-1;0<=r;r--)t&&this._markers[r].__dragStart||e.push(this._markers[r]);return e},getChildCount:function(){return this._childCount},zoomToBounds:function(e){for(var t,i=this._childClusters.slice(),r=this._group._map,n=r.getBoundsZoom(this._bounds),s=this._zoom+1,o=r.getZoom();0<i.length&&s<n;){s++;var a=[];for(t=0;t<i.length;t++)a=a.concat(i[t]._childClusters);i=a}s<n?this._group._map.setView(this._latlng,s):n<=o?this._group._map.setView(this._latlng,o+1):this._group._map.fitBounds(this._bounds,e)},getBounds:function(){var e=new L.LatLngBounds;return e.extend(this._bounds),e},_updateIcon:function(){this._iconNeedsUpdate=!0,this._icon&&this.setIcon(this)},createIcon:function(){return this._iconNeedsUpdate&&(this._iconObj=this._group.options.iconCreateFunction(this),this._iconNeedsUpdate=!1),this._iconObj.createIcon()},createShadow:function(){return this._iconObj.createShadow()},_addChild:function(e,t){this._iconNeedsUpdate=!0,this._boundsNeedUpdate=!0,this._setClusterCenter(e),e instanceof L.MarkerCluster?(t||(this._childClusters.push(e),e.__parent=this),this._childCount+=e._childCount):(t||this._markers.push(e),this._childCount++),this.__parent&&this.__parent._addChild(e,!0)},_setClusterCenter:function(e){this._cLatLng||(this._cLatLng=e._cLatLng||e._latlng)},_resetBounds:function(){var e=this._bounds;e._southWest&&(e._southWest.lat=1/0,e._southWest.lng=1/0),e._northEast&&(e._northEast.lat=-1/0,e._northEast.lng=-1/0)},_recalculateBounds:function(){var e,t,i,r,n=this._markers,s=this._childClusters,o=0,a=0,h=this._childCount;if(0!==h){for(this._resetBounds(),e=0;e<n.length;e++)i=n[e]._latlng,this._bounds.extend(i),o+=i.lat,a+=i.lng;for(e=0;e<s.length;e++)(t=s[e])._boundsNeedUpdate&&t._recalculateBounds(),this._bounds.extend(t._bounds),i=t._wLatLng,r=t._childCount,o+=i.lat*r,a+=i.lng*r;this._latlng=this._wLatLng=new L.LatLng(o/h,a/h),this._boundsNeedUpdate=!1}},_addToMap:function(e){e&&(this._backupLatlng=this._latlng,this.setLatLng(e)),this._group._featureGroup.addLayer(this)},_recursivelyAnimateChildrenIn:function(e,n,t){this._recursively(e,this._group._map.getMinZoom(),t-1,function(e){var t,i,r=e._markers;for(t=r.length-1;0<=t;t--)(i=r[t])._icon&&(i._setPos(n),i.clusterHide())},function(e){var t,i,r=e._childClusters;for(t=r.length-1;0<=t;t--)(i=r[t])._icon&&(i._setPos(n),i.clusterHide())})},_recursivelyAnimateChildrenInAndAddSelfToMap:function(t,i,r,n){this._recursively(t,n,i,function(e){e._recursivelyAnimateChildrenIn(t,e._group._map.latLngToLayerPoint(e.getLatLng()).round(),r),e._isSingleParent()&&r-1===n?(e.clusterShow(),e._recursivelyRemoveChildrenFromMap(t,i,r)):e.clusterHide(),e._addToMap()})},_recursivelyBecomeVisible:function(e,t){this._recursively(e,this._group._map.getMinZoom(),t,null,function(e){e.clusterShow()})},_recursivelyAddChildrenToMap:function(r,n,s){this._recursively(s,this._group._map.getMinZoom()-1,n,function(e){if(n!==e._zoom)for(var t=e._markers.length-1;0<=t;t--){var i=e._markers[t];s.contains(i._latlng)&&(r&&(i._backupLatlng=i.getLatLng(),i.setLatLng(r),i.clusterHide&&i.clusterHide()),e._group._featureGroup.addLayer(i))}},function(e){e._addToMap(r)})},_recursivelyRestoreChildPositions:function(e){for(var t=this._markers.length-1;0<=t;t--){var i=this._markers[t];i._backupLatlng&&(i.setLatLng(i._backupLatlng),delete i._backupLatlng)}if(e-1===this._zoom)for(var r=this._childClusters.length-1;0<=r;r--)this._childClusters[r]._restorePosition();else for(var n=this._childClusters.length-1;0<=n;n--)this._childClusters[n]._recursivelyRestoreChildPositions(e)},_restorePosition:function(){this._backupLatlng&&(this.setLatLng(this._backupLatlng),delete this._backupLatlng)},_recursivelyRemoveChildrenFromMap:function(e,t,i,r){var n,s;this._recursively(e,t-1,i-1,function(e){for(s=e._markers.length-1;0<=s;s--)n=e._markers[s],r&&r.contains(n._latlng)||(e._group._featureGroup.removeLayer(n),n.clusterShow&&n.clusterShow())},function(e){for(s=e._childClusters.length-1;0<=s;s--)n=e._childClusters[s],r&&r.contains(n._latlng)||(e._group._featureGroup.removeLayer(n),n.clusterShow&&n.clusterShow())})},_recursively:function(e,t,i,r,n){var s,o,a=this._childClusters,h=this._zoom;if(t<=h&&(r&&r(this),n&&h===i&&n(this)),h<t||h<i)for(s=a.length-1;0<=s;s--)(o=a[s])._boundsNeedUpdate&&o._recalculateBounds(),e.intersects(o._bounds)&&o._recursively(e,t,i,r,n)},_isSingleParent:function(){return 0<this._childClusters.length&&this._childClusters[0]._childCount===this._childCount}});L.Marker.include({clusterHide:function(){var e=this.options.opacity;return this.setOpacity(0),this.options.opacity=e,this},clusterShow:function(){return this.setOpacity(this.options.opacity)}}),L.DistanceGrid=function(e){this._cellSize=e,this._sqCellSize=e*e,this._grid={},this._objectPoint={}},L.DistanceGrid.prototype={addObject:function(e,t){var i=this._getCoord(t.x),r=this._getCoord(t.y),n=this._grid,s=n[r]=n[r]||{},o=s[i]=s[i]||[],a=L.Util.stamp(e);this._objectPoint[a]=t,o.push(e)},updateObject:function(e,t){this.removeObject(e),this.addObject(e,t)},removeObject:function(e,t){var i,r,n=this._getCoord(t.x),s=this._getCoord(t.y),o=this._grid,a=o[s]=o[s]||{},h=a[n]=a[n]||[];for(delete this._objectPoint[L.Util.stamp(e)],i=0,r=h.length;i<r;i++)if(h[i]===e)return h.splice(i,1),1===r&&delete a[n],!0},eachObject:function(e,t){var i,r,n,s,o,a,h=this._grid;for(i in h)for(r in o=h[i])for(n=0,s=(a=o[r]).length;n<s;n++)e.call(t,a[n])&&(n--,s--)},getNearObject:function(e){var t,i,r,n,s,o,a,h,l=this._getCoord(e.x),u=this._getCoord(e.y),_=this._objectPoint,d=this._sqCellSize,p=null;for(t=u-1;t<=u+1;t++)if(n=this._grid[t])for(i=l-1;i<=l+1;i++)if(s=n[i])for(r=0,o=s.length;r<o;r++)a=s[r],((h=this._sqDist(_[L.Util.stamp(a)],e))<d||h<=d&&null===p)&&(d=h,p=a);return p},_getCoord:function(e){var t=Math.floor(e/this._cellSize);return isFinite(t)?t:e},_sqDist:function(e,t){var i=t.x-e.x,r=t.y-e.y;return i*i+r*r}},L.QuickHull={getDistant:function(e,t){var i=t[1].lat-t[0].lat;return(t[0].lng-t[1].lng)*(e.lat-t[0].lat)+i*(e.lng-t[0].lng)},findMostDistantPointFromBaseLine:function(e,t){var i,r,n,s=0,o=null,a=[];for(i=t.length-1;0<=i;i--)r=t[i],0<(n=this.getDistant(r,e))&&(a.push(r),s<n&&(s=n,o=r));return{maxPoint:o,newPoints:a}},buildConvexHull:function(e,t){var i=[],r=this.findMostDistantPointFromBaseLine(e,t);return r.maxPoint?i=(i=i.concat(this.buildConvexHull([e[0],r.maxPoint],r.newPoints))).concat(this.buildConvexHull([r.maxPoint,e[1]],r.newPoints)):[e[0]]},getConvexHull:function(e){var t,i=!1,r=!1,n=!1,s=!1,o=null,a=null,h=null,l=null,u=null,_=null;for(t=e.length-1;0<=t;t--){var d=e[t];(!1===i||d.lat>i)&&(i=(o=d).lat),(!1===r||d.lat<r)&&(r=(a=d).lat),(!1===n||d.lng>n)&&(n=(h=d).lng),(!1===s||d.lng<s)&&(s=(l=d).lng)}return u=r!==i?(_=a,o):(_=l,h),[].concat(this.buildConvexHull([_,u],e),this.buildConvexHull([u,_],e))}},L.MarkerCluster.include({getConvexHull:function(){var e,t,i=this.getAllChildMarkers(),r=[];for(t=i.length-1;0<=t;t--)e=i[t].getLatLng(),r.push(e);return L.QuickHull.getConvexHull(r)}}),L.MarkerCluster.include({_2PI:2*Math.PI,_circleFootSeparation:25,_circleStartAngle:0,_spiralFootSeparation:28,_spiralLengthStart:11,_spiralLengthFactor:5,_circleSpiralSwitchover:9,spiderfy:function(){if(this._group._spiderfied!==this&&!this._group._inZoomAnimation){var e,t=this.getAllChildMarkers(null,!0),i=this._group._map.latLngToLayerPoint(this._latlng);this._group._unspiderfy(),e=(this._group._spiderfied=this)._group.options.spiderfyShapePositions?this._group.options.spiderfyShapePositions(t.length,i):t.length>=this._circleSpiralSwitchover?this._generatePointsSpiral(t.length,i):(i.y+=10,this._generatePointsCircle(t.length,i)),this._animationSpiderfy(t,e)}},unspiderfy:function(e){this._group._inZoomAnimation||(this._animationUnspiderfy(e),this._group._spiderfied=null)},_generatePointsCircle:function(e,t){var i,r,n=this._group.options.spiderfyDistanceMultiplier*this._circleFootSeparation*(2+e)/this._2PI,s=this._2PI/e,o=[];for(n=Math.max(n,35),o.length=e,i=0;i<e;i++)r=this._circleStartAngle+i*s,o[i]=new L.Point(t.x+n*Math.cos(r),t.y+n*Math.sin(r))._round();return o},_generatePointsSpiral:function(e,t){var i,r=this._group.options.spiderfyDistanceMultiplier,n=r*this._spiralLengthStart,s=r*this._spiralFootSeparation,o=r*this._spiralLengthFactor*this._2PI,a=0,h=[];for(i=h.length=e;0<=i;i--)i<e&&(h[i]=new L.Point(t.x+n*Math.cos(a),t.y+n*Math.sin(a))._round()),n+=o/(a+=s/n+5e-4*i);return h},_noanimationUnspiderfy:function(){var e,t,i=this._group,r=i._map,n=i._featureGroup,s=this.getAllChildMarkers(null,!0);for(i._ignoreMove=!0,this.setOpacity(1),t=s.length-1;0<=t;t--)e=s[t],n.removeLayer(e),e._preSpiderfyLatlng&&(e.setLatLng(e._preSpiderfyLatlng),delete e._preSpiderfyLatlng),e.setZIndexOffset&&e.setZIndexOffset(0),e._spiderLeg&&(r.removeLayer(e._spiderLeg),delete e._spiderLeg);i.fire("unspiderfied",{cluster:this,markers:s}),i._ignoreMove=!1,i._spiderfied=null}}),L.MarkerClusterNonAnimated=L.MarkerCluster.extend({_animationSpiderfy:function(e,t){var i,r,n,s,o=this._group,a=o._map,h=o._featureGroup,l=this._group.options.spiderLegPolylineOptions;for(o._ignoreMove=!0,i=0;i<e.length;i++)s=a.layerPointToLatLng(t[i]),r=e[i],n=new L.Polyline([this._latlng,s],l),a.addLayer(n),r._spiderLeg=n,r._preSpiderfyLatlng=r._latlng,r.setLatLng(s),r.setZIndexOffset&&r.setZIndexOffset(1e6),h.addLayer(r);this.setOpacity(.3),o._ignoreMove=!1,o.fire("spiderfied",{cluster:this,markers:e})},_animationUnspiderfy:function(){this._noanimationUnspiderfy()}}),L.MarkerCluster.include({_animationSpiderfy:function(e,t){var i,r,n,s,o,a,h=this,l=this._group,u=l._map,_=l._featureGroup,d=this._latlng,p=u.latLngToLayerPoint(d),c=L.Path.SVG,f=L.extend({},this._group.options.spiderLegPolylineOptions),m=f.opacity;for(void 0===m&&(m=L.MarkerClusterGroup.prototype.options.spiderLegPolylineOptions.opacity),c?(f.opacity=0,f.className=(f.className||"")+" leaflet-cluster-spider-leg"):f.opacity=m,l._ignoreMove=!0,i=0;i<e.length;i++)r=e[i],a=u.layerPointToLatLng(t[i]),n=new L.Polyline([d,a],f),u.addLayer(n),r._spiderLeg=n,c&&(o=(s=n._path).getTotalLength()+.1,s.style.strokeDasharray=o,s.style.strokeDashoffset=o),r.setZIndexOffset&&r.setZIndexOffset(1e6),r.clusterHide&&r.clusterHide(),_.addLayer(r),r._setPos&&r._setPos(p);for(l._forceLayout(),l._animationStart(),i=e.length-1;0<=i;i--)a=u.layerPointToLatLng(t[i]),(r=e[i])._preSpiderfyLatlng=r._latlng,r.setLatLng(a),r.clusterShow&&r.clusterShow(),c&&((s=(n=r._spiderLeg)._path).style.strokeDashoffset=0,n.setStyle({opacity:m}));this.setOpacity(.3),l._ignoreMove=!1,setTimeout(function(){l._animationEnd(),l.fire("spiderfied",{cluster:h,markers:e})},200)},_animationUnspiderfy:function(e){var t,i,r,n,s,o,a=this,h=this._group,l=h._map,u=h._featureGroup,_=e?l._latLngToNewLayerPoint(this._latlng,e.zoom,e.center):l.latLngToLayerPoint(this._latlng),d=this.getAllChildMarkers(null,!0),p=L.Path.SVG;for(h._ignoreMove=!0,h._animationStart(),this.setOpacity(1),i=d.length-1;0<=i;i--)(t=d[i])._preSpiderfyLatlng&&(t.closePopup(),t.setLatLng(t._preSpiderfyLatlng),delete t._preSpiderfyLatlng,o=!0,t._setPos&&(t._setPos(_),o=!1),t.clusterHide&&(t.clusterHide(),o=!1),o&&u.removeLayer(t),p&&(s=(n=(r=t._spiderLeg)._path).getTotalLength()+.1,n.style.strokeDashoffset=s,r.setStyle({opacity:0})));h._ignoreMove=!1,setTimeout(function(){var e=0;for(i=d.length-1;0<=i;i--)(t=d[i])._spiderLeg&&e++;for(i=d.length-1;0<=i;i--)(t=d[i])._spiderLeg&&(t.clusterShow&&t.clusterShow(),t.setZIndexOffset&&t.setZIndexOffset(0),1<e&&u.removeLayer(t),l.removeLayer(t._spiderLeg),delete t._spiderLeg);h._animationEnd(),h.fire("unspiderfied",{cluster:a,markers:d})},200)}}),L.MarkerClusterGroup.include({_spiderfied:null,unspiderfy:function(){this._unspiderfy.apply(this,arguments)},_spiderfierOnAdd:function(){this._map.on("click",this._unspiderfyWrapper,this),this._map.options.zoomAnimation&&this._map.on("zoomstart",this._unspiderfyZoomStart,this),this._map.on("zoomend",this._noanimationUnspiderfy,this),L.Browser.touch||this._map.getRenderer(this)},_spiderfierOnRemove:function(){this._map.off("click",this._unspiderfyWrapper,this),this._map.off("zoomstart",this._unspiderfyZoomStart,this),this._map.off("zoomanim",this._unspiderfyZoomAnim,this),this._map.off("zoomend",this._noanimationUnspiderfy,this),this._noanimationUnspiderfy()},_unspiderfyZoomStart:function(){this._map&&this._map.on("zoomanim",this._unspiderfyZoomAnim,this)},_unspiderfyZoomAnim:function(e){L.DomUtil.hasClass(this._map._mapPane,"leaflet-touching")||(this._map.off("zoomanim",this._unspiderfyZoomAnim,this),this._unspiderfy(e))},_unspiderfyWrapper:function(){this._unspiderfy()},_unspiderfy:function(e){this._spiderfied&&this._spiderfied.unspiderfy(e)},_noanimationUnspiderfy:function(){this._spiderfied&&this._spiderfied._noanimationUnspiderfy()},_unspiderfyLayer:function(e){e._spiderLeg&&(this._featureGroup.removeLayer(e),e.clusterShow&&e.clusterShow(),e.setZIndexOffset&&e.setZIndexOffset(0),this._map.removeLayer(e._spiderLeg),delete e._spiderLeg)}}),L.MarkerClusterGroup.include({refreshClusters:function(e){return e?e instanceof L.MarkerClusterGroup?e=e._topClusterLevel.getAllChildMarkers():e instanceof L.LayerGroup?e=e._layers:e instanceof L.MarkerCluster?e=e.getAllChildMarkers():e instanceof L.Marker&&(e=[e]):e=this._topClusterLevel.getAllChildMarkers(),this._flagParentsIconsNeedUpdate(e),this._refreshClustersIcons(),this.options.singleMarkerMode&&this._refreshSingleMarkerModeMarkers(e),this},_flagParentsIconsNeedUpdate:function(e){var t,i;for(t in e)for(i=e[t].__parent;i;)i._iconNeedsUpdate=!0,i=i.__parent},_refreshSingleMarkerModeMarkers:function(e){var t,i;for(t in e)i=e[t],this.hasLayer(i)&&i.setIcon(this._overrideMarkerIcon(i))}}),L.Marker.include({refreshIconOptions:function(e,t){var i=this.options.icon;return L.setOptions(i,e),this.setIcon(i),t&&this.__parent&&this.__parent._group.refreshClusters(this),this}}),e.MarkerClusterGroup=t,e.MarkerCluster=i,Object.defineProperty(e,"__esModule",{value:!0})});
 //# sourceMappingURL=leaflet.markercluster.js.map</script>
 <script>/* 由 build.js 从 data/ 生成，勿手改 */
-window.SEED_VERSION = "bf238a0c";
+window.SEED_VERSION = "b73bbeb9";
 window.SEED_PLACES = [
   {
     "id": "place:bj:3824471a",
@@ -1238,6 +1244,16 @@ window.SEED_PLACES = [
     "person": "隋坡",
     "categories": [
       "餐馆"
+    ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6acbb48d00000000150138b3",
+        "title": "北京探店之阿招鸡煲"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a40a318000000002103d54f",
+        "title": "难怪阿招鸡煲没有沙姜"
+      }
     ],
     "kind": "eat",
     "createdAt": 1731988500000
@@ -1263,6 +1279,16 @@ window.SEED_PLACES = [
     "categories": [
       "餐馆"
     ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6abe4c4900000000150038ff",
+        "title": "北京奢华酒店分级，选择按预算直接抄作业"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a356779000000001503e789",
+        "title": "我不会再选择北京四季酒店入住"
+      }
+    ],
     "kind": "eat",
     "createdAt": 1731729000000
   },
@@ -1286,6 +1312,16 @@ window.SEED_PLACES = [
     "person": "隋坡",
     "categories": [
       "餐馆"
+    ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/696cab71000000001a031acc",
+        "title": "隋坡探店｜厨忆小湖南｜避雷❌失望而归"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6923322c000000001e03a7ad",
+        "title": "北京探店-厨忆小湖南"
+      }
     ],
     "kind": "eat",
     "createdAt": 1763263800000
@@ -1311,6 +1347,16 @@ window.SEED_PLACES = [
     "categories": [
       "餐馆"
     ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6aa78b6f000000002a00461f",
+        "title": "中关村第六季真的再见了！"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6abe4702000000001203e7ba",
+        "title": "北京自助餐系列测评｜第七弹｜第六季"
+      }
+    ],
     "kind": "eat",
     "createdAt": 1781772966000
   },
@@ -1334,6 +1380,16 @@ window.SEED_PLACES = [
     "person": "隋坡",
     "categories": [
       "餐馆"
+    ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6aa97c9c0000000026033209",
+        "title": "俄士厨房☹️☹️☹️☹️"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/69e5ab890000000021011f3b",
+        "title": "俄士厨房你的好评是刷的吗"
+      }
     ],
     "kind": "eat",
     "createdAt": 1729569265000
@@ -1359,6 +1415,16 @@ window.SEED_PLACES = [
     "categories": [
       "餐馆"
     ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a9d6c4c0000000011032524",
+        "title": "作为一个河南人吐槽一下中关村方中山"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af81b8e00000000180381a9",
+        "title": "在北京喝上了正宗的方中山胡辣汤"
+      }
+    ],
     "kind": "eat",
     "createdAt": 1732247400000
   },
@@ -1382,6 +1448,16 @@ window.SEED_PLACES = [
     "person": "隋坡",
     "categories": [
       "餐馆"
+    ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ad97fdf000000003101c7f6",
+        "title": "拜托帮忙选选！"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a75c9470000000029033399",
+        "title": "廣顺興(劲松店)测评"
+      }
     ],
     "kind": "eat",
     "createdAt": 1729137539000
@@ -1407,6 +1483,16 @@ window.SEED_PLACES = [
     "categories": [
       "餐馆"
     ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ae827bc0000000010012771",
+        "title": "黑知了TRAVEL——北京华贸店"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a8c2e750000000028028c22",
+        "title": "黑知了--讲究的东北菜"
+      }
+    ],
     "kind": "eat",
     "createdAt": 1730519400000
   },
@@ -1430,6 +1516,16 @@ window.SEED_PLACES = [
     "person": "隋坡",
     "categories": [
       "餐馆"
+    ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/69c677e5000000001a021cf5",
+        "title": "探店北京大兴街边小馆【纪家小馆】"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/69a46d8d000000002602f260",
+        "title": "吃着舒服的店真的不多见—纪家小馆"
+      }
     ],
     "kind": "eat",
     "createdAt": 1772422200000
@@ -1455,6 +1551,16 @@ window.SEED_PLACES = [
     "categories": [
       "餐馆"
     ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6add8985000000002403b4eb",
+        "title": "研究生真实分享｜五道口金谷园不踩雷推荐"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a2988850000000007024af5",
+        "title": "什么时候拷打金谷园和五道口枣糕王？"
+      }
+    ],
     "kind": "eat",
     "createdAt": 1726285800000
   },
@@ -1478,6 +1584,16 @@ window.SEED_PLACES = [
     "person": "隋坡",
     "categories": [
       "餐馆"
+    ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/69eb6cc2000000003701d40f",
+        "title": "北京探店：金山小馆·Bistro"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6adf60e900000000090185cf",
+        "title": "北京|金山小馆（霄云路）"
+      }
     ],
     "kind": "eat",
     "createdAt": 1754796600000
@@ -1503,6 +1619,16 @@ window.SEED_PLACES = [
     "categories": [
       "餐馆"
     ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6aa3a76e00000000260090cb",
+        "title": "芳菲路上的芳香:兰怡砂锅"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/69228e1f000000001f00eadf",
+        "title": "兰怡砂锅，青豆肥肠绝了"
+      }
+    ],
     "kind": "eat",
     "createdAt": 1725336337000
   },
@@ -1526,6 +1652,16 @@ window.SEED_PLACES = [
     "person": "隋坡",
     "categories": [
       "餐馆"
+    ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af5c19e00000000160331c5",
+        "title": "北京20公里也要去吃陈晓卿推荐的懒人业余"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a3a8ef100000000060227fa",
+        "title": "北京 | 懒人业余餐厅"
+      }
     ],
     "kind": "eat",
     "createdAt": 1727063617000
@@ -1551,6 +1687,16 @@ window.SEED_PLACES = [
     "categories": [
       "餐馆"
     ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a6014c9000000000f0176da",
+        "title": "北京老白家临汾牛肉丸子面"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ac8d852000000001c00d3b7",
+        "title": "北京天通苑临汾牛肉丸子面"
+      }
+    ],
     "kind": "eat",
     "createdAt": 1725594600000
   },
@@ -1574,6 +1720,16 @@ window.SEED_PLACES = [
     "person": "隋坡",
     "categories": [
       "餐馆"
+    ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/685ac0b0000000001c0364d1",
+        "title": "北京探店 | 聚柳林烤鸭店"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/659c2059000000001d026079",
+        "title": "北京｜吃烤鸭可以去柳林烤鸭店👍🏻"
+      }
     ],
     "kind": "eat",
     "createdAt": 1724644200000
@@ -1599,6 +1755,16 @@ window.SEED_PLACES = [
     "categories": [
       "餐馆"
     ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a154a320000000008026a29",
+        "title": "求推荐北京南门涮肉"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a5a3fb9000000000f032a35",
+        "title": "北京南门涮肉避坑🔥正宗直营门店清单！"
+      }
+    ],
     "kind": "eat",
     "createdAt": 1725162600000
   },
@@ -1622,6 +1788,12 @@ window.SEED_PLACES = [
     "person": "隋坡",
     "categories": [
       "餐馆"
+    ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ae8605a0000000033036795",
+        "title": "减脂解馋！尼岔土家菜+冯记豆花双打卡"
+      }
     ],
     "kind": "eat",
     "createdAt": 1726199400000
@@ -1647,6 +1819,16 @@ window.SEED_PLACES = [
     "categories": [
       "餐馆"
     ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/695e1948000000000a02ad07",
+        "title": "吃遍北京1⃣0⃣3⃣千岛湖鱼味馆(对外经贸）"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/687cfdc7000000000b01d2f0",
+        "title": "不愧是北京千岛湖驻京办🐟😋！"
+      }
+    ],
     "kind": "eat",
     "createdAt": 1729828200000
   },
@@ -1670,6 +1852,16 @@ window.SEED_PLACES = [
     "person": "隋坡",
     "categories": [
       "餐馆"
+    ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6adc64da000000002b02a081",
+        "title": "福建菜 | 沁旺达海鲜餐厅"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/69876002000000000b0088be",
+        "title": "🍲美食·和朋友一起吃沁旺达海鲜餐厅"
+      }
     ],
     "kind": "eat",
     "createdAt": 1730087400000
@@ -1695,6 +1887,16 @@ window.SEED_PLACES = [
     "categories": [
       "餐馆"
     ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ab5fc10000000001c01f7fd",
+        "title": "全聚德依然是外地人去北京最好的选择之一"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a73a9a1000000000e03b400",
+        "title": "北京烤鸭到底哪家强？这份对比请收好，别再只认全聚德了！"
+      }
+    ],
     "kind": "eat",
     "createdAt": 1746070200000
   },
@@ -1718,6 +1920,16 @@ window.SEED_PLACES = [
     "person": "隋坡",
     "categories": [
       "餐馆"
+    ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6abfaea3000000001402e0e9",
+        "title": "打卡顺义全宜美肉饼！"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/69c99b22000000002202526e",
+        "title": "顺义小官庄 全宜美肉饼"
+      }
     ],
     "kind": "eat",
     "createdAt": 1761017400000
@@ -1743,6 +1955,16 @@ window.SEED_PLACES = [
     "categories": [
       "餐馆"
     ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a9b987800000000260159d8",
+        "title": "锐评一下三秦人家"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a5ce9cc000000001c01173c",
+        "title": "去了隋老师夸的三秦人家，可惜没吃上！"
+      }
+    ],
     "kind": "eat",
     "createdAt": 1784431800000
   },
@@ -1766,6 +1988,16 @@ window.SEED_PLACES = [
     "person": "隋坡",
     "categories": [
       "餐馆"
+    ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/69bf96b70000000020038812",
+        "title": "山居满陇"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/69cd39690000000022029e3a",
+        "title": "山居满陇北京首店尝鲜"
+      }
     ],
     "kind": "eat",
     "createdAt": 1732593000000
@@ -1791,6 +2023,16 @@ window.SEED_PLACES = [
     "categories": [
       "餐馆"
     ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/68380047000000000c03813d",
+        "title": "＃水一方鱼馆探店了＃"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6922fe5b000000001e00bce3",
+        "title": "避雷 北京兆军惠民餐厅（原水一方鱼馆）"
+      }
+    ],
     "kind": "eat",
     "createdAt": 1747798200000
   },
@@ -1814,6 +2056,16 @@ window.SEED_PLACES = [
     "person": "隋坡",
     "categories": [
       "餐馆"
+    ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6aeeeb3b0000000003016768",
+        "title": "维人和已吃不欠"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6aa4530f0000000028001b16",
+        "title": "特厨探店 | 餐桌上有一座山？！维人和餐厅"
+      }
     ],
     "kind": "eat",
     "createdAt": 1789183800000
@@ -1839,6 +2091,16 @@ window.SEED_PLACES = [
     "categories": [
       "餐馆"
     ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a5dbfc9000000000100e191",
+        "title": "对外经贸-蜗牛小馆🐌"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ac10a47000000001303d702",
+        "title": "原图直出探店北京No.6 之 蜗牛小馆88分"
+      }
+    ],
     "kind": "eat",
     "createdAt": 1728619200000
   },
@@ -1862,6 +2124,16 @@ window.SEED_PLACES = [
     "person": "隋坡",
     "categories": [
       "餐馆"
+    ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a7d9f39000000002701f692",
+        "title": "拔草篇——北京国贸喜鼎"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/69f36a30000000001a02c7f8",
+        "title": "北京喜鼎海胆水饺测评"
+      }
     ],
     "kind": "eat",
     "createdAt": 1760067000000
@@ -1887,6 +2159,16 @@ window.SEED_PLACES = [
     "categories": [
       "餐馆"
     ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/68745ca5000000002400e028",
+        "title": "小厨娘竟然开到北京了！排队3小时也要吃上"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a98c32f0000000026017009",
+        "title": "小厨娘淮扬菜/环宇荟"
+      }
+    ],
     "kind": "eat",
     "createdAt": 1729223400000
   },
@@ -1910,6 +2192,16 @@ window.SEED_PLACES = [
     "person": "隋坡",
     "categories": [
       "餐馆"
+    ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a25665e0000000016024cf1",
+        "title": "周末吃吃喝喝之小饭馆大厨师"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ac8f7650000000018017efb",
+        "title": "在北京的宝藏小饭馆！！"
+      }
     ],
     "kind": "eat",
     "createdAt": 1760326200000
@@ -1935,6 +2227,16 @@ window.SEED_PLACES = [
     "categories": [
       "餐馆"
     ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a950aa00000000024007836",
+        "title": "打卡大兴薛顺斋"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ac4b8b7000000001801a504",
+        "title": "打卡薛顺斋铜锅+烧烤 展开说说真实感受"
+      }
+    ],
     "kind": "eat",
     "createdAt": 1787820600000
   },
@@ -1958,6 +2260,16 @@ window.SEED_PLACES = [
     "person": "隋坡",
     "categories": [
       "餐馆"
+    ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a8d83fe0000000024007adb",
+        "title": "北京迎春面馆实话实说版｜附价格和停车攻略"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ab203e10000000034034e31",
+        "title": "N刷迎春面馆，建议"
+      }
     ],
     "kind": "eat",
     "createdAt": 1730346600000
@@ -1983,6 +2295,16 @@ window.SEED_PLACES = [
     "categories": [
       "餐馆"
     ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/696b833800000000220229dd",
+        "title": "北京值得吃什么：铜川驻京办（玉华宫宾馆）"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/69a66fb50000000015033a8f",
+        "title": "玉华宫宾馆"
+      }
+    ],
     "kind": "eat",
     "createdAt": 1724989800000
   },
@@ -2006,6 +2328,16 @@ window.SEED_PLACES = [
     "person": "隋坡",
     "categories": [
       "餐馆"
+    ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/685e4dbb000000000d024c68",
+        "title": "特厨探店 |众多网红推荐的炖菜小馆—泽秀"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/68cfd21f000000000b03fdd2",
+        "title": "老冯寻肉记——泽秀饭馆"
+      }
     ],
     "kind": "eat",
     "createdAt": 1751081400000
@@ -2031,6 +2363,12 @@ window.SEED_PLACES = [
     "categories": [
       "餐馆"
     ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/69be562500000000230145c6",
+        "title": "被严重低估的驻京办美食！准噶尔餐厅！"
+      }
+    ],
     "kind": "eat",
     "createdAt": 1723780200000
   },
@@ -2055,6 +2393,12 @@ window.SEED_PLACES = [
     "categories": [
       "餐馆"
     ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ad726180000000025036f94",
+        "title": "KŌNG胶东小馆-龙湖丽泽天街店（值得试试）"
+      }
+    ],
     "kind": "eat",
     "createdAt": 1725853801000
   },
@@ -2078,6 +2422,16 @@ window.SEED_PLACES = [
     "person": "隋坡",
     "categories": [
       "餐馆"
+    ],
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/69031a7c00000000070081ca",
+        "title": "来试试米其林新上的品牌"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/694d005f000000001e031a17",
+        "title": "(北京)2026最新版米其林必比登推荐！！！"
+      }
     ],
     "kind": "eat",
     "createdAt": 1727409600000
@@ -2108,6 +2462,16 @@ window.SEED_PLACES = [
     "season": "春",
     "indoor": false,
     "cost": "2–10 元",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af5ded80000000025013820",
+        "title": "玉渊潭的银杏黄了！是心动的感觉！🍂"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af1ad060000000034028dbb",
+        "title": "玉渊潭之秋"
+      }
+    ],
     "createdAt": 1600000000000
   },
   {
@@ -2136,6 +2500,16 @@ window.SEED_PLACES = [
     "season": "春/秋",
     "indoor": false,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af6aea5000000002a028959",
+        "title": "11.13 今日奥森 光秃秃的了"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af831ce0000000026024aee",
+        "title": "奥森银杏快落光‼️别跑空啦🍂"
+      }
+    ],
     "createdAt": 1599999999000
   },
   {
@@ -2164,6 +2538,16 @@ window.SEED_PLACES = [
     "season": "春",
     "indoor": false,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ac85cce000000000a01f94d",
+        "title": "房山秋日顶流！这里的粉黛花海太好拍了💜"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6aec3068000000001a01440e",
+        "title": "房山长阳周末干点啥（11.7-8）"
+      }
+    ],
     "createdAt": 1599999998000
   },
   {
@@ -2192,6 +2576,16 @@ window.SEED_PLACES = [
     "season": "四季",
     "indoor": false,
     "cost": "20–30 元",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/69f71b810000000038020b04",
+        "title": "颐和园是不是北京人最多的景点"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a11532e00000000070131d2",
+        "title": "住在北京颐和园里是什么样的体验？"
+      }
+    ],
     "createdAt": 1599999997000
   },
   {
@@ -2220,6 +2614,16 @@ window.SEED_PLACES = [
     "season": "春/秋",
     "indoor": false,
     "cost": "3 元",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af7e8760000000024030dc5",
+        "title": "11.14人山人海北京中山公园赏秋"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af44601000000000902134d",
+        "title": "11.11实拍 去中山公园可别在天安门西站下车"
+      }
+    ],
     "createdAt": 1599999996000
   },
   {
@@ -2248,6 +2652,16 @@ window.SEED_PLACES = [
     "season": "春/秋",
     "indoor": false,
     "cost": "10 元",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af5cef7000000001c031737",
+        "title": "11.12实拍 | 国家植物园北园的秋景🍂"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af429c1000000002a03b784",
+        "title": "不喷雾的水杉林（国家植物园）还值得去吗？"
+      }
+    ],
     "createdAt": 1599999995000
   },
   {
@@ -2276,6 +2690,12 @@ window.SEED_PLACES = [
     "season": "春",
     "indoor": false,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af50d710000000023010e02",
+        "title": "元大都城垣遗址公园感受北京五彩斑斓的秋天"
+      }
+    ],
     "createdAt": 1599999994000
   },
   {
@@ -2304,6 +2724,16 @@ window.SEED_PLACES = [
     "season": "春",
     "indoor": false,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6aec59a500000000030049cf",
+        "title": "银杏铁路美到失语！将府公园的秋身处油画里"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af15610000000002c027e12",
+        "title": "🍁将府公园北园银杏林｜包场独享一片金色林"
+      }
+    ],
     "createdAt": 1599999993000
   },
   {
@@ -2332,6 +2762,16 @@ window.SEED_PLACES = [
     "season": "夏/秋",
     "indoor": false,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af82c2700000000260120f0",
+        "title": "和北京华为男dating3个月去亮马河78次"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6aa13864000000002700b927",
+        "title": "北京city walk天花板🌃｜亮马河"
+      }
+    ],
     "createdAt": 1599999992000
   },
   {
@@ -2360,6 +2800,16 @@ window.SEED_PLACES = [
     "season": "夏/秋",
     "indoor": false,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6adcac04000000002b00e833",
+        "title": "什刹海。圆梦了再也不来了。"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af6d4fd0000000025010862",
+        "title": "荷花市场进什刹海这样走吃不一样的北京馒头"
+      }
+    ],
     "createdAt": 1599999991000
   },
   {
@@ -2388,6 +2838,16 @@ window.SEED_PLACES = [
     "season": "夏",
     "indoor": false,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af3f84d000000002b024ec6",
+        "title": "树村公园，清河之洲慢跑骑行"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af46fe5000000002a0242a5",
+        "title": "清晨的清河之洲，美得有些不真实"
+      }
+    ],
     "createdAt": 1599999990000
   },
   {
@@ -2416,6 +2876,12 @@ window.SEED_PLACES = [
     "season": "夏",
     "indoor": false,
     "cost": "门票",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6aed7891000000002a0183f4",
+        "title": "百望山首要避雷"
+      }
+    ],
     "createdAt": 1599999989000
   },
   {
@@ -2444,6 +2910,16 @@ window.SEED_PLACES = [
     "season": "夏",
     "indoor": false,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ae9aca40000000007002be6",
+        "title": "银河SOHO | 北京最科幻建筑🧿"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/69fc791c000000001a0344ec",
+        "title": "银河soho"
+      }
+    ],
     "createdAt": 1599999988000
   },
   {
@@ -2472,6 +2948,16 @@ window.SEED_PLACES = [
     "season": "夏",
     "indoor": false,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6962237d00000000210338ff",
+        "title": "北京夜游天花板！蓝色港湾浪漫暴走💙"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ad4fd7400000000270149b2",
+        "title": "没地铁还堵车， 北京蓝色港湾凭啥热度不减"
+      }
+    ],
     "createdAt": 1599999987000
   },
   {
@@ -2500,6 +2986,16 @@ window.SEED_PLACES = [
     "season": "夏",
     "indoor": false,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af2fa5e000000002b0072bb",
+        "title": "2026.11.10奥体中心银杏大道"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6aef0b930000000016007d7c",
+        "title": "北京赏秋🍂11.5奥体银杏实况"
+      }
+    ],
     "createdAt": 1599999986000
   },
   {
@@ -2528,6 +3024,16 @@ window.SEED_PLACES = [
     "season": "夏",
     "indoor": false,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af4fa9c000000002203b4c4",
+        "title": "11.12·南苑湿地公园-辐射雾"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6aedcfa5000000002503ab79",
+        "title": "📍南苑湿地森林公园2026.11.4—11.5"
+      }
+    ],
     "createdAt": 1599999985000
   },
   {
@@ -2556,6 +3062,16 @@ window.SEED_PLACES = [
     "season": "夏",
     "indoor": false,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/69227bb1000000001f009114",
+        "title": "避雷吧家人们，西边模式口步行街citywalk 路"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6aa688400000000026014bfc",
+        "title": "模式口：8块钱看明司礼监大太监墓地+下地宫"
+      }
+    ],
     "createdAt": 1599999984000
   },
   {
@@ -2584,6 +3100,16 @@ window.SEED_PLACES = [
     "season": "秋",
     "indoor": false,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af5577d000000001b01d6f1",
+        "title": "钓鱼台银杏大道真漂亮"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af2f1a3000000001802a1f6",
+        "title": "11.10实拍｜钓鱼台银杏大道正在旺季"
+      }
+    ],
     "createdAt": 1599999983000
   },
   {
@@ -2612,6 +3138,16 @@ window.SEED_PLACES = [
     "season": "秋",
     "indoor": false,
     "cost": "2 元",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af79fac000000002b0051e8",
+        "title": "地坛公园银杏浓度已达100%｜11.12实拍附点位"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af805070000000026013eb9",
+        "title": "🍂11.14地坛公园银杏美爆了！！！！！"
+      }
+    ],
     "createdAt": 1599999982000
   },
   {
@@ -2640,6 +3176,16 @@ window.SEED_PLACES = [
     "season": "秋",
     "indoor": false,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af5622a000000002b0279c8",
+        "title": "11月12日北小河公园"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ae5588f000000001200bf0f",
+        "title": "北小河公园很综合|出片点位不止莫奈花园"
+      }
+    ],
     "createdAt": 1599999981000
   },
   {
@@ -2668,6 +3214,16 @@ window.SEED_PLACES = [
     "season": "秋",
     "indoor": false,
     "cost": "10 元",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af6aeb0000000002500b219",
+        "title": "🍂谁懂啊！清晨圆明园东门线｜遗址+银杏"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af82b56000000002303e288",
+        "title": "11.14圆明园"
+      }
+    ],
     "createdAt": 1599999980000
   },
   {
@@ -2696,6 +3252,16 @@ window.SEED_PLACES = [
     "season": "秋",
     "indoor": false,
     "cost": "15 元",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af57af1000000002b038f08",
+        "title": "🍂11.12天坛银杏再不来就秃了！！！！！"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af81a2f000000002903e149",
+        "title": "北京｜11.14 天坛你让我朋友圈怎么交待"
+      }
+    ],
     "createdAt": 1599999979000
   },
   {
@@ -2724,6 +3290,16 @@ window.SEED_PLACES = [
     "season": "秋",
     "indoor": false,
     "cost": "10 元",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af1a9ee0000000034015cc6",
+        "title": "北海菊展最后一周！11.9实拍，正是好时候"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af5ab5e0000000023012870",
+        "title": "北京赏秋｜北海公园5块钱2小时省力路线攻略"
+      }
+    ],
     "createdAt": 1599999978000
   },
   {
@@ -2752,6 +3328,16 @@ window.SEED_PLACES = [
     "season": "秋",
     "indoor": false,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ad6ab6e000000002601c220",
+        "title": "五四大街→西兴隆街citywalk路线✅附地图"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6adfc974000000002903f96e",
+        "title": "速看！北京五四大街的秋，一条文艺赏秋路线！"
+      }
+    ],
     "createdAt": 1599999977000
   },
   {
@@ -2780,6 +3366,16 @@ window.SEED_PLACES = [
     "season": "秋",
     "indoor": false,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af72d9e00000000180397ce",
+        "title": "11.13实况！北京三里屯🍂银杏大道杀疯了！！！"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6aee874f000000000603233f",
+        "title": "11.5三里屯东五街让北平的秋到达天花板！"
+      }
+    ],
     "createdAt": 1599999976000
   },
   {
@@ -2808,6 +3404,16 @@ window.SEED_PLACES = [
     "season": "秋",
     "indoor": false,
     "cost": "30 元",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6aed677d000000002303c5d2",
+        "title": "11.6实况赏秋🍂地坛+国子监citywalk路线"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6aac69950000000011030be7",
+        "title": "北京孔庙和国子监13大看点和隐藏玩法"
+      }
+    ],
     "createdAt": 1599999975000
   },
   {
@@ -2836,6 +3442,16 @@ window.SEED_PLACES = [
     "season": "秋",
     "indoor": false,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ae31bda000000001802b206",
+        "title": "北京秋天 | 10.29白家疃银杏隧道"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ae4bb7c0000000025039bf9",
+        "title": "10.30白家疃银杏到了最佳观赏期"
+      }
+    ],
     "createdAt": 1599999974000
   },
   {
@@ -2864,6 +3480,12 @@ window.SEED_PLACES = [
     "season": "秋",
     "indoor": false,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af5a17f0000000016030764",
+        "title": "奥林匹克公园vs奥森，完胜"
+      }
+    ],
     "createdAt": 1599999973000
   },
   {
@@ -2892,6 +3514,16 @@ window.SEED_PLACES = [
     "season": "雨",
     "indoor": true,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6925bfcf000000001f0087fc",
+        "title": "免费免预约！北京大运河博物馆能逛一整天"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ae71d560000000025039ccf",
+        "title": "⛵️北京大运河博物馆。免费！免预约❗️❗️"
+      }
+    ],
     "createdAt": 1599999972000
   },
   {
@@ -2920,6 +3552,16 @@ window.SEED_PLACES = [
     "season": "雨",
     "indoor": true,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/69e1fd5b000000001e00c986",
+        "title": "韩美林艺术馆遛娃｜美育启蒙天花板✨"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6aef4551000000001802f864",
+        "title": "韩美林艺术馆赏秋"
+      }
+    ],
     "createdAt": 1599999971000
   },
   {
@@ -2948,6 +3590,16 @@ window.SEED_PLACES = [
     "season": "雨",
     "indoor": true,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af3ef43000000002501ff89",
+        "title": "遛娃避雷中国电影博物馆"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ab10dff000000003501f394",
+        "title": "北京中国电影博物馆，从上往下逛，保姆攻略，"
+      }
+    ],
     "createdAt": 1599999970000
   },
   {
@@ -2976,6 +3628,16 @@ window.SEED_PLACES = [
     "season": "雨",
     "indoor": true,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a499938000000001603d5ff",
+        "title": "免费❣️中国工艺美术馆保姆级游玩攻略"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6987256b000000001d0104d7",
+        "title": "中国工艺美术馆需要至少3小时以上"
+      }
+    ],
     "createdAt": 1599999969000
   },
   {
@@ -3004,6 +3666,16 @@ window.SEED_PLACES = [
     "season": "雨",
     "indoor": true,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af0576e000000001501568c",
+        "title": "首都博物馆"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af82fbc000000001f0174ba",
+        "title": "首都博物馆文物展"
+      }
+    ],
     "createdAt": 1599999968000
   },
   {
@@ -3032,6 +3704,16 @@ window.SEED_PLACES = [
     "season": "雨",
     "indoor": true,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a47af330000000022009e17",
+        "title": "📍国家自然博物馆｜保姆级参观攻略"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6aa4c5e2000000000b00fa32",
+        "title": "被小红书骗去国家自然博物馆"
+      }
+    ],
     "createdAt": 1599999967000
   },
   {
@@ -3060,6 +3742,16 @@ window.SEED_PLACES = [
     "season": "雨",
     "indoor": true,
     "cost": "30 元",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a7bde740000000024026ca5",
+        "title": "中国科技馆别乱买票｜一天根本逛不完"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ae6fe140000000026024b40",
+        "title": "中国科技馆一天，避雷，腿已废！"
+      }
+    ],
     "createdAt": 1599999966000
   },
   {
@@ -3088,6 +3780,16 @@ window.SEED_PLACES = [
     "season": "雨",
     "indoor": true,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/69244bd9000000000d03f178",
+        "title": "798 艺术区保姆级攻略来啦～"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ae077dc000000002000bf18",
+        "title": "北京798免费展览｜10场合集🎨10.31-11.15"
+      }
+    ],
     "createdAt": 1599999965000
   },
   {
@@ -3116,6 +3818,16 @@ window.SEED_PLACES = [
     "season": "雨",
     "indoor": true,
     "cost": "40 元",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a86f7d80000000028028b84",
+        "title": "北京胡同里的惊喜:南池子美术馆"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af129b20000000034026b54",
+        "title": "南池子美术馆|在北京二环里欣赏江南秋意"
+      }
+    ],
     "createdAt": 1599999964000
   },
   {
@@ -3144,6 +3856,16 @@ window.SEED_PLACES = [
     "season": "冬",
     "indoor": true,
     "cost": "约 265 元/晚",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/69fb71f4000000000f03ac00",
+        "title": "200💰在良乡可以泡上的私汤♨"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/692ba4e4000000001e0038a1",
+        "title": "男朋友带我来的，说是北京数一数二的……"
+      }
+    ],
     "createdAt": 1599999963000
   },
   {
@@ -3172,6 +3894,16 @@ window.SEED_PLACES = [
     "season": "冬",
     "indoor": false,
     "cost": "门票",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af44fd90000000023013e51",
+        "title": "11.11潭柘寺千年古银杏黄透了，美到失语"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ae30011000000001f004204",
+        "title": "北京潭柘寺的🐱🦊大战"
+      }
+    ],
     "createdAt": 1599999962000
   },
   {
@@ -3200,6 +3932,16 @@ window.SEED_PLACES = [
     "season": "冬",
     "indoor": false,
     "cost": "门票",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af06ea2000000001802c161",
+        "title": "北京秋日顶流🍁古北水镇赏秋"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af1af110000000035031860",
+        "title": "🍂古北水镇｜都说商业化，我还是被美到了"
+      }
+    ],
     "createdAt": 1599999961000
   },
   {
@@ -3228,6 +3970,16 @@ window.SEED_PLACES = [
     "season": "秋",
     "indoor": false,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af81560000000001f0143e4",
+        "title": "雁栖湖 堵了两个小时 太阳已经下山"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ac0927a00000000180297e6",
+        "title": "避雷雁栖湖"
+      }
+    ],
     "createdAt": 1599999960000
   },
   {
@@ -3256,6 +4008,16 @@ window.SEED_PLACES = [
     "season": "冬",
     "indoor": false,
     "cost": "130–220 元",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6aea9536000000000e02eb22",
+        "title": "石京龙滑雪场到底怎么玩❄️"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6aeaa4730000000003003886",
+        "title": "石京龙实测，阳坡晒太阳滑雪太舒服🏂"
+      }
+    ],
     "createdAt": 1599999959000
   },
   {
@@ -3284,6 +4046,16 @@ window.SEED_PLACES = [
     "season": "四季",
     "indoor": false,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a67254400000000130269a5",
+        "title": "北京逛吃天花板！好吃又出片的牛街宝藏路线"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a73a6d0000000000e03f401",
+        "title": "北京牛街逛吃指南，跟着走就对了！"
+      }
+    ],
     "createdAt": 1599999958000
   },
   {
@@ -3312,6 +4084,12 @@ window.SEED_PLACES = [
     "season": "四季",
     "indoor": false,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af6c507000000002b01b963",
+        "title": "它唯一的缺点：北京鼓楼限定！！！！！"
+      }
+    ],
     "createdAt": 1599999957000
   },
   {
@@ -3340,6 +4118,16 @@ window.SEED_PLACES = [
     "season": "四季",
     "indoor": false,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6ad09ada000000000202a7d5",
+        "title": "最不像北京的北京！东交民巷Citywalk攻略！"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6af836a8000000001c031b61",
+        "title": "北京免费小众｜东交民巷里的警察博物馆👮"
+      }
+    ],
     "createdAt": 1599999956000
   },
   {
@@ -3368,6 +4156,16 @@ window.SEED_PLACES = [
     "season": "四季",
     "indoor": false,
     "cost": "免费",
+    "xhs": [
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a697cf3000000000f029f69",
+        "title": "正阳门恢复对外开放，但真没必要去！"
+      },
+      {
+        "url": "https://www.xiaohongshu.com/explore/6a7475bf000000003400e352",
+        "title": "正阳楼已参观，人已崩，但幸运看到了零公里点"
+      }
+    ],
     "createdAt": 1599999955000
   },
   {
@@ -3396,6 +4194,7 @@ window.SEED_PLACES = [
     "season": "四季",
     "indoor": false,
     "cost": "免费",
+    "xhs": [],
     "createdAt": 1599999954000
   },
   {
@@ -3424,6 +4223,7 @@ window.SEED_PLACES = [
     "season": "四季",
     "indoor": false,
     "cost": "免费",
+    "xhs": [],
     "createdAt": 1599999953000
   },
   {
@@ -3452,6 +4252,7 @@ window.SEED_PLACES = [
     "season": "四季",
     "indoor": false,
     "cost": "20 元",
+    "xhs": [],
     "createdAt": 1599999952000
   },
   {
@@ -3480,6 +4281,7 @@ window.SEED_PLACES = [
     "season": "四季",
     "indoor": false,
     "cost": "免费",
+    "xhs": [],
     "createdAt": 1599999951000
   }
 ];
@@ -3631,6 +4433,7 @@ window.SEED_PLACES = [
       season: p.season || '',
       indoor: !!p.indoor,
       cost: p.cost || '',
+      xhs: Array.isArray(p.xhs) ? p.xhs.filter(function (x) { return x && x.url; }).slice(0, 2) : [],
       cuisine: p.cuisine || '',
       price: numOrNull(p.price),
       rating: numOrNull(p.rating),
@@ -4265,6 +5068,14 @@ window.SEED_PLACES = [
       if (label.length > 46) label = label.slice(0, 46) + '…';
       html += '<div class="info-row"><span>原视频</span><p><a href="' + esc(src) + '" target="_blank" rel="noopener">' +
         esc(label) + '</a></p></div>';
+    }
+    if (p.xhs && p.xhs.length) {
+      html += '<div class="info-row"><span>小红书</span><p class="xhs-links">' +
+        p.xhs.map(function (x) {
+          var t = String(x.title || '打开笔记');
+          if (t.length > 24) t = t.slice(0, 24) + '…';
+          return '<a href="' + esc(x.url) + '" target="_blank" rel="noopener">' + esc(t) + '</a>';
+        }).join('') + '</p></div>';
     }
     if (!play) {
       html += '<div class="info-row"><span>点评</span><p><a href="' + esc(dianpingUrl(p)) +
